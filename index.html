@@ -11,19 +11,32 @@ body { display:flex; flex-direction:column; align-items:center; justify-content:
 .hint { display:none; color:#fff; font-size:14px; padding:8px 12px; text-align:center; }
 @media (orientation: portrait) { .hint { display:block; } }
 .stage { position:relative; width:min(100vw, 177.78dvh); aspect-ratio:16/9; container-type:inline-size; overflow:hidden; background:#000; flex-shrink:0; }
-.screen { position:absolute; inset:0; display:none; }
-.screen.active { display:block; }
-.screen img.bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+.screen { position:absolute; inset:0; display:block; opacity:0; pointer-events:none; transform:scale(1.015); transition:opacity 0.35s ease, transform 0.35s ease; }
+.screen.active { opacity:1; pointer-events:auto; transform:scale(1); }
+.scene { position:absolute; inset:0; animation:kb 18s ease-in-out infinite alternate; }
+@keyframes kb { from { transform:scale(1) translateY(0); } to { transform:scale(1.04) translateY(-0.6%); } }
+.scene img.bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
 .hot { position:absolute; background:transparent; border:none; cursor:pointer; padding:0; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
 .hot:active { background:rgba(255,255,255,0.18); border-radius:16px; }
 .hot:focus-visible { outline:3px solid rgba(255,255,255,0.9); outline-offset:2px; border-radius:12px; }
 input.hot-text { color:#1a2f5a; font-weight:700; font-size:14px; font-size:3.1cqw; padding-left:13%; padding-right:5%; background:transparent; border:none; outline:none; text-align:left; }
 input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
+#btn-mulai { border-radius:999px; animation:mulaiPulse 2.2s ease-in-out infinite; }
+@keyframes mulaiPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,205,60,0); } 50% { box-shadow:0 0 0 10px rgba(255,205,60,0.22), 0 0 26px 6px rgba(255,205,60,0.30); } }
+.menu-hot { border-radius:20px; animation:softPulse 3s ease-in-out infinite; }
+@keyframes softPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,255,255,0); } 50% { box-shadow:0 0 18px 2px rgba(255,255,255,0.20); } }
+.sparkles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:5; }
+.sparkles span { position:absolute; bottom:-4%; border-radius:50%; background:radial-gradient(circle, #ffffff 0%, #ffe27a 60%, rgba(255,226,122,0) 70%); opacity:0; animation:rise linear infinite; }
+@keyframes rise { 0% { transform:translateY(0); opacity:0; } 8% { opacity:0.95; } 85% { opacity:0.5; } 100% { transform:translateY(-62cqw); opacity:0; } }
+.shine { position:absolute; top:-40%; left:-40%; width:35%; height:180%; background:linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.14) 45%, rgba(255,255,255,0.26) 50%, rgba(255,255,255,0.14) 55%, rgba(255,255,255,0) 100%); transform:rotate(18deg); pointer-events:none; z-index:4; animation:sweep 7s ease-in-out infinite; }
+@keyframes sweep { 0%,55% { left:-40%; } 85%,100% { left:130%; } }
 .toast { position:absolute; left:50%; top:4%; transform:translateX(-50%); background:rgba(10,20,50,0.92); color:#fff; font-size:14px; font-size:3cqw; font-weight:600; padding:1.2cqw 3cqw; border-radius:999px; z-index:30; display:none; white-space:nowrap; }
 .toast.show { display:block; }
 .overlay { position:absolute; inset:0; background:rgba(8,18,48,0.62); display:none; align-items:center; justify-content:center; z-index:20; }
 .overlay.show { display:flex; }
 .card { background:#fff8e7; border:4px solid #f5a623; border-radius:20px; width:62%; max-width:560px; padding:5cqw 5cqw; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.4); }
+.overlay.show .card { animation:pop 0.3s ease; }
+@keyframes pop { from { transform:scale(0.88); opacity:0; } to { transform:scale(1); opacity:1; } }
 .card h2 { color:#1a2f5a; font-size:18px; font-size:5cqw; margin-bottom:2cqw; }
 .card p { color:#333; font-size:14px; font-size:3.2cqw; line-height:1.5; margin-bottom:3.5cqw; }
 .card button { background:#f5a623; color:#fff; border:none; border-radius:999px; font-weight:800; font-size:14px; font-size:3.4cqw; padding:2cqw 6cqw; cursor:pointer; }
@@ -37,6 +50,7 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 <div class="stage" id="stage">
 <div class="toast" id="toast"></div>
 <div class="screen active" id="layar-awal">
+<div class="scene">
 <img class="bg" src="assets/beranda.jpg" alt="LEGAL QUEST">
 <input class="hot hot-text" id="input-nama" type="text" autocomplete="off" maxlength="40" style="left:35.5%; top:53.1%; width:31.3%; height:7.3%;" aria-label="Masukkan Nama">
 <input class="hot hot-text" id="input-kelas" type="text" list="daftar-kelas" autocomplete="off" maxlength="20" style="left:35.5%; top:62.9%; width:31.3%; height:7.6%;" aria-label="Pilih Kelas">
@@ -45,17 +59,28 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 </datalist>
 <button class="hot" id="btn-mulai" style="left:39.5%; top:77.6%; width:25%; height:12.4%;" aria-label="Mulai"></button>
 </div>
+<div class="sparkles"></div>
+<div class="shine"></div>
+</div>
 <div class="screen" id="layar-menu">
+<div class="scene">
 <img class="bg" src="assets/menu-utama.jpg" alt="Menu Utama">
-<button class="hot" data-target="layar-tujuan" style="left:21%; top:38.1%; width:27.7%; height:22%;" aria-label="Tujuan Pembelajaran"></button>
-<button class="hot" data-soon="1" style="left:50.9%; top:38.1%; width:28.3%; height:22%;" aria-label="Jelajah Materi"></button>
-<button class="hot" data-soon="1" style="left:20.9%; top:62.7%; width:27.8%; height:19%;" aria-label="Game Zone"></button>
-<button class="hot" data-soon="1" style="left:51%; top:62.7%; width:28.3%; height:19%;" aria-label="Hasil Belajar"></button>
-<button class="hot" data-soon="1" style="left:39.5%; top:84.9%; width:21.2%; height:7.5%;" aria-label="Tentang Kreator"></button>
+<button class="hot menu-hot" data-target="layar-tujuan" style="left:21%; top:38.1%; width:27.7%; height:22%;" aria-label="Tujuan Pembelajaran"></button>
+<button class="hot menu-hot" data-soon="1" style="left:50.9%; top:38.1%; width:28.3%; height:22%;" aria-label="Jelajah Materi"></button>
+<button class="hot menu-hot" data-soon="1" style="left:20.9%; top:62.7%; width:27.8%; height:19%;" aria-label="Game Zone"></button>
+<button class="hot menu-hot" data-soon="1" style="left:51%; top:62.7%; width:28.3%; height:19%;" aria-label="Hasil Belajar"></button>
+<button class="hot menu-hot" data-soon="1" style="left:39.5%; top:84.9%; width:21.2%; height:7.5%;" aria-label="Tentang Kreator"></button>
+</div>
+<div class="sparkles"></div>
+<div class="shine"></div>
 </div>
 <div class="screen" id="layar-tujuan">
+<div class="scene">
 <img class="bg" src="assets/tujuan-pembelajaran.jpg" alt="Tujuan Pembelajaran">
-<button class="hot" data-target="layar-menu" style="left:39.1%; top:86.5%; width:23%; height:9%;" aria-label="Kembali ke Menu"></button>
+<button class="hot menu-hot" data-target="layar-menu" style="left:39.1%; top:86.5%; width:23%; height:9%;" aria-label="Kembali ke Menu"></button>
+</div>
+<div class="sparkles"></div>
+<div class="shine"></div>
 </div>
 <div class="overlay" id="overlay-segera">
 <div class="card">
@@ -110,6 +135,19 @@ backButtons[k].addEventListener('click', function() { showScreen(this.getAttribu
 }
 document.getElementById('btn-tutup-segera').addEventListener('click', function() { document.getElementById('overlay-segera').classList.remove('show'); });
 document.getElementById('overlay-segera').addEventListener('click', function(e) { if (e.target === this) { this.classList.remove('show'); } });
+var sparkleBoxes = document.querySelectorAll('.sparkles');
+for (var s = 0; s < sparkleBoxes.length; s++) {
+for (var n = 0; n < 14; n++) {
+var sp = document.createElement('span');
+var size = (0.8 + Math.random() * 1.0).toFixed(2);
+sp.style.left = (2 + Math.random() * 96).toFixed(1) + '%';
+sp.style.width = size + 'cqw';
+sp.style.height = size + 'cqw';
+sp.style.animationDuration = (7 + Math.random() * 7).toFixed(1) + 's';
+sp.style.animationDelay = (Math.random() * 12).toFixed(1) + 's';
+sparkleBoxes[s].appendChild(sp);
+}
+}
 try {
 var saved = JSON.parse(localStorage.getItem('legalquest-player') || 'null');
 if (saved) {
