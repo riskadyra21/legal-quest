@@ -25,9 +25,9 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 @keyframes mulaiPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,205,60,0); } 50% { box-shadow:0 0 0 10px rgba(255,205,60,0.22), 0 0 26px 6px rgba(255,205,60,0.30); } }
 .menu-hot { border-radius:20px; animation:softPulse 3s ease-in-out infinite; }
 @keyframes softPulse { 0%,100% { box-shadow:0 0 0 0 rgba(255,255,255,0); } 50% { box-shadow:0 0 18px 2px rgba(255,255,255,0.20); } }
-.sparkles { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:5; }
-.sparkles span { position:absolute; bottom:-4%; border-radius:50%; background:radial-gradient(circle, #ffffff 0%, #ffe27a 60%, rgba(255,226,122,0) 70%); opacity:0; animation:rise linear infinite; }
-@keyframes rise { 0% { transform:translateY(0); opacity:0; } 8% { opacity:0.95; } 85% { opacity:0.5; } 100% { transform:translateY(-62cqw); opacity:0; } }
+.controls { position:fixed; top:10px; right:10px; z-index:100; display:flex; gap:8px; }
+.controls button { background:rgba(10,20,50,0.65); color:#fff; border:1px solid rgba(255,255,255,0.35); border-radius:999px; font-size:12px; font-weight:700; padding:7px 12px; cursor:pointer; }
+.controls button:active { transform:scale(0.95); }
 .shine { position:absolute; top:-40%; left:-40%; width:35%; height:180%; background:linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.14) 45%, rgba(255,255,255,0.26) 50%, rgba(255,255,255,0.14) 55%, rgba(255,255,255,0) 100%); transform:rotate(18deg); pointer-events:none; z-index:4; animation:sweep 7s ease-in-out infinite; }
 @keyframes sweep { 0%,55% { left:-40%; } 85%,100% { left:130%; } }
 .toast { position:absolute; left:50%; top:4%; transform:translateX(-50%); background:rgba(10,20,50,0.92); color:#fff; font-size:14px; font-size:3cqw; font-weight:600; padding:1.2cqw 3cqw; border-radius:999px; z-index:30; display:none; white-space:nowrap; }
@@ -47,6 +47,7 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 </head>
 <body>
 <div class="hint">Putar HP ke landscape biar layarnya penuh</div>
+<div class="controls"><button id="btn-musik" aria-label="Musik">♪ Musik: Off</button><button id="btn-layar" aria-label="Layar penuh">⛶ Layar Penuh</button></div>
 <div class="stage" id="stage">
 <div class="toast" id="toast"></div>
 <div class="screen active" id="layar-awal">
@@ -59,7 +60,6 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 </datalist>
 <button class="hot" id="btn-mulai" style="left:39.5%; top:77.6%; width:25%; height:12.4%;" aria-label="Mulai"></button>
 </div>
-<div class="sparkles"></div>
 <div class="shine"></div>
 </div>
 <div class="screen" id="layar-menu">
@@ -71,7 +71,6 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 <button class="hot menu-hot" data-soon="1" style="left:51%; top:62.7%; width:28.3%; height:19%;" aria-label="Hasil Belajar"></button>
 <button class="hot menu-hot" data-soon="1" style="left:39.5%; top:84.9%; width:21.2%; height:7.5%;" aria-label="Tentang Kreator"></button>
 </div>
-<div class="sparkles"></div>
 <div class="shine"></div>
 </div>
 <div class="screen" id="layar-tujuan">
@@ -79,7 +78,6 @@ input.hot-text:focus { background:rgba(255,255,255,0.35); border-radius:10px; }
 <img class="bg" src="assets/tujuan-pembelajaran.jpg" alt="Tujuan Pembelajaran">
 <button class="hot menu-hot" data-target="layar-menu" style="left:39.1%; top:86.5%; width:23%; height:9%;" aria-label="Kembali ke Menu"></button>
 </div>
-<div class="sparkles"></div>
 <div class="shine"></div>
 </div>
 <div class="overlay" id="overlay-segera">
@@ -117,6 +115,8 @@ var kelas = document.getElementById('input-kelas').value.trim();
 if (!nama) { showToast('Isi nama dulu ya'); goyang(document.getElementById('input-nama')); return; }
 if (!kelas) { showToast('Pilih atau isi kelas dulu ya'); goyang(document.getElementById('input-kelas')); return; }
 try { localStorage.setItem('legalquest-player', JSON.stringify({ nama: nama, kelas: kelas })); } catch (e) {}
+mulaiMusik();
+masukLayar();
 showScreen('layar-menu');
 }
 document.getElementById('btn-mulai').addEventListener('click', mulai);
@@ -135,19 +135,94 @@ backButtons[k].addEventListener('click', function() { showScreen(this.getAttribu
 }
 document.getElementById('btn-tutup-segera').addEventListener('click', function() { document.getElementById('overlay-segera').classList.remove('show'); });
 document.getElementById('overlay-segera').addEventListener('click', function(e) { if (e.target === this) { this.classList.remove('show'); } });
-var sparkleBoxes = document.querySelectorAll('.sparkles');
-for (var s = 0; s < sparkleBoxes.length; s++) {
-for (var n = 0; n < 14; n++) {
-var sp = document.createElement('span');
-var size = (0.8 + Math.random() * 1.0).toFixed(2);
-sp.style.left = (2 + Math.random() * 96).toFixed(1) + '%';
-sp.style.width = size + 'cqw';
-sp.style.height = size + 'cqw';
-sp.style.animationDuration = (7 + Math.random() * 7).toFixed(1) + 's';
-sp.style.animationDelay = (Math.random() * 12).toFixed(1) + 's';
-sparkleBoxes[s].appendChild(sp);
+function sedangLayarPenuh() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function labelLayar() {
+document.getElementById('btn-layar').textContent = sedangLayarPenuh() ? '⛶ Keluar' : '⛶ Layar Penuh';
+}
+function masukLayar() {
+try {
+if (!sedangLayarPenuh()) {
+var el = document.documentElement;
+var p = null;
+if (el.requestFullscreen) { p = el.requestFullscreen(); } else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+if (p && p.catch) { p.catch(function() {}); }
+}
+} catch (e) {}
+}
+function alihLayar() {
+try {
+if (sedangLayarPenuh()) {
+if (document.exitFullscreen) { document.exitFullscreen(); } else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+} else { masukLayar(); }
+} catch (e) {}
+}
+document.getElementById('btn-layar').addEventListener('click', alihLayar);
+document.addEventListener('fullscreenchange', labelLayar);
+document.addEventListener('webkitfullscreenchange', labelLayar);
+var musikCtx = null;
+var musikMaster = null;
+var musikJalan = false;
+var musikMatiManual = false;
+var musikTimer = null;
+var musikLangkah = 0;
+var musikWaktu = 0;
+var ketuk = 60 / 112;
+var nadaMelodi = [659.25, 783.99, 1046.50, 783.99, 587.33, 783.99, 493.88, 783.99, 659.25, 880.00, 1046.50, 880.00, 698.46, 880.00, 1046.50, 880.00];
+var nadaBas = [130.81, 98.00, 98.00, 146.83, 110.00, 164.81, 87.31, 130.81];
+function bunyi(frek, mulai, lama, bentuk, kuat) {
+var osc = musikCtx.createOscillator();
+var g = musikCtx.createGain();
+osc.type = bentuk;
+osc.frequency.value = frek;
+g.gain.setValueAtTime(0.0001, mulai);
+g.gain.exponentialRampToValueAtTime(kuat, mulai + 0.03);
+g.gain.exponentialRampToValueAtTime(0.0001, mulai + lama);
+osc.connect(g);
+g.connect(musikMaster);
+osc.start(mulai);
+osc.stop(mulai + lama + 0.05);
+}
+function jadwalMusik() {
+if (!musikCtx) { return; }
+if (musikWaktu < musikCtx.currentTime - 0.1) { musikWaktu = musikCtx.currentTime + 0.1; }
+while (musikWaktu < musikCtx.currentTime + 0.6) {
+var idx = musikLangkah % 16;
+bunyi(nadaMelodi[idx], musikWaktu, ketuk * 0.95, 'triangle', 0.10);
+if (musikLangkah % 2 === 0) { bunyi(nadaBas[(musikLangkah / 2) % 8], musikWaktu, ketuk * 1.9, 'sine', 0.08); }
+musikWaktu += ketuk;
+musikLangkah++;
 }
 }
+function labelMusik() {
+document.getElementById('btn-musik').textContent = musikJalan ? '♪ Musik: On' : '♪ Musik: Off';
+}
+function mulaiMusik() {
+if (musikJalan || musikMatiManual) { return; }
+try {
+if (!musikCtx) {
+var AC = window.AudioContext || window.webkitAudioContext;
+musikCtx = new AC();
+musikMaster = musikCtx.createGain();
+musikMaster.gain.value = 1;
+musikMaster.connect(musikCtx.destination);
+}
+if (musikCtx.state === 'suspended') { musikCtx.resume(); }
+musikWaktu = musikCtx.currentTime + 0.1;
+musikLangkah = 0;
+musikTimer = setInterval(jadwalMusik, 200);
+musikJalan = true;
+labelMusik();
+} catch (e) {}
+}
+function hentiMusik() {
+if (musikTimer) { clearInterval(musikTimer); musikTimer = null; }
+if (musikCtx && musikCtx.state === 'running') { musikCtx.suspend(); }
+musikJalan = false;
+labelMusik();
+}
+document.getElementById('btn-musik').addEventListener('click', function() {
+if (musikJalan) { musikMatiManual = true; hentiMusik(); } else { musikMatiManual = false; mulaiMusik(); }
+});
 try {
 var saved = JSON.parse(localStorage.getItem('legalquest-player') || 'null');
 if (saved) {
